@@ -42,20 +42,18 @@ public class MantemClienteI implements MantemCliente {
 	public Optional<Cliente> save(Cliente cliente) {
 		logger.info(">>>>>> servico save chamado ");
 		Optional<Cliente> umCliente = consultaPorCpf(cliente.getCpf());
-		 Optional<Cliente> novoCliente = Optional.empty();
 		Endereco endereco = obtemEndereco(cliente.getCep());
-		try {
+	
 			if (umCliente.isEmpty() & endereco != null) {
+				logger.info(">>>>>> servico save - dados validos");
 				cliente.obtemDataAtual(new DateTime());
 				cliente.setEndereco(endereco.getLogradouro());
-                novoCliente = Optional.ofNullable(repository.save(cliente));
-                logger.info(">>>>>> servico save - dados validos");
+                return Optional.ofNullable(repository.save(cliente));
+ 			}
+			else {
+				return Optional.empty();
 			}
-		} catch (Exception e) { // org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException
-			logger.info(">>>>>> servico save erro - org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException");
-			
-		}
-		return novoCliente;
+		
 	}
 
 	@Override
@@ -78,7 +76,7 @@ public class MantemClienteI implements MantemCliente {
 			logger.info(">>>>>> 2. servico altera cliente cep valido para o id => " + clienteModificado.getId());
 			return Optional.ofNullable(repository.save(clienteModificado));
 		} else {
-			return null;
+			return Optional.empty();
 		}
 
 	}
