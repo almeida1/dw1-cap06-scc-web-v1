@@ -15,6 +15,7 @@ import com.fatec.scc.model.Cliente;
 import com.fatec.scc.model.Endereco;
 import com.fatec.scc.ports.ClienteRepository;
 import com.fatec.scc.ports.MantemCliente;
+
 @Service
 public class MantemClienteI implements MantemCliente {
 	Logger logger = LogManager.getLogger(this.getClass());
@@ -43,17 +44,14 @@ public class MantemClienteI implements MantemCliente {
 		logger.info(">>>>>> servico save chamado ");
 		Optional<Cliente> umCliente = consultaPorCpf(cliente.getCpf());
 		Endereco endereco = obtemEndereco(cliente.getCep());
-	
-			if (umCliente.isEmpty() & endereco != null) {
-				logger.info(">>>>>> servico save - dados validos");
-				cliente.obtemDataAtual(new DateTime());
-				cliente.setEndereco(endereco.getLogradouro());
-                return Optional.ofNullable(repository.save(cliente));
- 			}
-			else {
-				return Optional.empty();
-			}
-		
+		if (umCliente.isEmpty() & endereco != null) {
+			logger.info(">>>>>> servico save - dados validos");
+			cliente.obtemDataAtual(new DateTime());
+			cliente.setEndereco(endereco.getLogradouro());
+			return Optional.ofNullable(repository.save(cliente));
+		} else {
+			return Optional.empty();
+		}
 	}
 
 	@Override
@@ -78,15 +76,12 @@ public class MantemClienteI implements MantemCliente {
 		} else {
 			return Optional.empty();
 		}
-
 	}
-
 	public Endereco obtemEndereco(String cep) {
 		RestTemplate template = new RestTemplate();
 		String url = "https://viacep.com.br/ws/{cep}/json/";
 		logger.info(">>>>>> servico consultaCep - " + cep);
 		ResponseEntity<Endereco> resposta = null;
-
 		try {
 			resposta = template.getForEntity(url, Endereco.class, cep);
 			return resposta.getBody();
