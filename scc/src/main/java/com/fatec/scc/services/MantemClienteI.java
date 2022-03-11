@@ -66,13 +66,19 @@ public class MantemClienteI implements MantemCliente {
 		Optional<Cliente> umCliente = consultaPorId(cliente.getId());
 		Endereco endereco = obtemEndereco(cliente.getCep());
 		if (umCliente.isPresent() & endereco != null) {
-			Cliente clienteModificado = new Cliente(cliente.getNome(), cliente.getDataNascimento(), cliente.getSexo(),
-					cliente.getCpf(), cliente.getCep(), cliente.getComplemento());
-			clienteModificado.setId(cliente.getId());
-			clienteModificado.obtemDataAtual(new DateTime());
-			clienteModificado.setEndereco(endereco.getLogradouro());
-			logger.info(">>>>>> 2. servico altera cliente cep valido para o id => " + clienteModificado.getId());
-			return Optional.ofNullable(repository.save(clienteModificado));
+			
+			umCliente.get().setNome(cliente.getNome());
+			umCliente.get().setDataNascimento(cliente.getDataNascimento());
+			umCliente.get().setSexo(cliente.getSexo());
+			umCliente.get().setCpf(cliente.getCpf());
+			umCliente.get().setCep(cliente.getCep());
+			umCliente.get().setComplemento(cliente.getComplemento());
+			umCliente.get().setId(cliente.getId());
+			umCliente.get().obtemDataAtual(new DateTime());
+			umCliente.get().setEndereco(endereco.getLogradouro());
+			
+			logger.info(">>>>>> 2. servico altera cliente dados validos ");
+			return Optional.ofNullable(repository.save(umCliente.get()));
 		} else {
 			return Optional.empty();
 		}
